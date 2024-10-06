@@ -1,51 +1,60 @@
 package com.example.demo.fileupload.service;
 
-import com.azure.storage.blob.BlobClientBuilder;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ServiceClient-> ContainerClient -> Blob files
+ */
 @Service
 public class BlobStorageService {
 
-//	@Value("${azure.storage.connection-string}")
-//	private String connectionString;
-//	@Value("${azure.storage.container-name}")
-//	private String containerName;
-//
-//	private BlobContainerClient getBlobContainerClient() {
-//		return new BlobClientBuilder()
-//				.connectionString(connectionString)
-//				.containerName(containerName)
-//				.buildClient().getContainerClient();
-//	}
+	@Value("${azure.storage.connection-string}")
+	private String connectionString;
+	@Value("${azure.storage.container-name}")
+	private String containerName;
 
-	public void uploadBlob(String blobName, String content) {
-		InputStream dataStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-		//getBlobContainerClient().getBlobClient(blobName).upload(dataStream, content.length(), true);
+	private BlobContainerClient getBlobContainerClient( ) {
+		// Create a BlobServiceClient to interact with the service
+		BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+				.connectionString(connectionString)
+				.buildClient();
+
+		// Get the container client for the specified container name
+		return blobServiceClient.getBlobContainerClient(containerName);
 	}
 
-	public String downloadBlob(String blobName) {
-		//return getBlobContainerClient().getBlobClient(blobName).downloadContent().toString();
-		return null;
+
+	public void uploadBlob(String filename, InputStream content, long size) {
+		getBlobContainerClient()
+				.getBlobClient(filename)
+				.upload(content, size, false);
 	}
 
-	public void deleteBlob(String blobName) {
-		//getBlobContainerClient().getBlobClient(blobName).delete();
+	public byte[] downloadBlob(String filename) {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		getBlobContainerClient().getBlobClient(filename).downloadStream(outputStream);
+		return outputStream.toByteArray();
 	}
 
-	public List<String> listBlobs() {
-		List<String> blobNames = new ArrayList<>();
-//		for (BlobItem blobItem : getBlobContainerClient().listBlobs()) {
-//			blobNames.add(blobItem.getName());
-//		}
-		return blobNames;
+	public void deleteBlob(String filename) {
+		getBlobContainerClient().getBlobClient(filename).delete();
+	}
+
+	public List<String> listBlobs( ) {
+		List<String> filenames = new ArrayList<>();
+		for (BlobItem blobItem : getBlobContainerClient().listBlobs()) {
+			filenames.add(blobItem.getName());
+		}
+		return filenames;
 	}
 }

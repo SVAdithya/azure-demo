@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -52,7 +54,8 @@ public class FileUploadController {
 	@GetMapping("/{id}/metadata")
 	public ResponseEntity<Object> getFileMetadata(
 			@Parameter(description = "ID of the file to retrieve metadata for") @PathVariable String id) {
-		FileMetaResponse metadata = fileService.getFileMetadata(id);
+		// FileMetaResponse metadata = fileService.getFileMetadata(id);
+		List<String> metadata = fileService.getFileMetadata(id);
 		return ResponseEntity.ok(metadata);
 	}
 

@@ -1,6 +1,5 @@
 package com.example.demo.fileupload.service.impl;
 
-import com.example.demo.fileupload.controller.response.FileMetaResponse;
 import com.example.demo.fileupload.cosmos.dto.FileMetadata;
 import com.example.demo.fileupload.service.BlobStorageService;
 import com.example.demo.fileupload.service.FileMetadataService;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,38 +21,31 @@ public class FileServiceImpl implements FileService {
 	public String uploadFile(MultipartFile file) throws IOException {
 		String fileId = UUID.nameUUIDFromBytes(file.getBytes()).toString();
 
-				// Move to file Storage
-		blobStorageService.uploadBlob(fileId,file.toString());
-
+		// Move to file Storage
+		blobStorageService.uploadBlob(fileId, file.getInputStream(), file.getSize());
+		return null;
 		// Generate metadata
-		FileMetadata fileMetadata = fileMetadataService.saveFileMetadata(
-				file.getOriginalFilename(),
-				fileId,
-				file.getSize(),
-				file.getContentType()
-		);
-		return fileMetadata.fileName();
 	}
 
 	public byte[] downloadFile(String id) {
-		//TODO:
-		return null;
+		return blobStorageService.downloadBlob(id);
 	}
 
-	public FileMetaResponse getFileMetadata(String id) {
-		FileMetadata fileMetadata = fileMetadataService.getFileMetadataById(id);
-		return new FileMetaResponse(
+	public List<String> getFileMetadata(String id) {
+		return blobStorageService.listBlobs();
+		/* return new FileMetaResponse(
 				fileMetadata.fileName(),
 				fileMetadata.fileType(),
 				fileMetadata.fileSize(),
 				fileMetadata.fileId(),
 				fileMetadata.isArchived(),
 				fileMetadata.isDeleted()
-		);
+		); */
+		//return null;
 	}
 
 	public String deleteFile(String id) {
-		//TODO:
+		blobStorageService.deleteBlob(id);
 		return fileMetadataService.deleteFileMetadata(id);
 	}
 

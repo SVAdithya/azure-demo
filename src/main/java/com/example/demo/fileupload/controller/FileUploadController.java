@@ -1,7 +1,6 @@
 package com.example.demo.fileupload.controller;
 
-import com.example.demo.fileupload.controller.response.FileMetaResponse;
-import com.example.demo.fileupload.service.impl.FileServiceImpl;
+import com.example.demo.fileupload.service.FileServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @RestController

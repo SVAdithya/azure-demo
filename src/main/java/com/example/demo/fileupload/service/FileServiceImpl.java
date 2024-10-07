@@ -1,20 +1,17 @@
-package com.example.demo.fileupload.service.impl;
+package com.example.demo.fileupload.service;
 
-import com.example.demo.fileupload.cosmos.dto.FileMetadata;
-import com.example.demo.fileupload.service.BlobStorageService;
-import com.example.demo.fileupload.service.FileMetadataService;
-import com.example.demo.fileupload.service.FileService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class FileServiceImpl implements FileService {
+public class FileServiceImpl {
 	private FileMetadataService fileMetadataService;
 	private BlobStorageService blobStorageService;
 
@@ -23,7 +20,13 @@ public class FileServiceImpl implements FileService {
 
 		// Move to file Storage
 		blobStorageService.uploadBlob(fileId, file.getInputStream(), file.getSize());
-		return null;
+		fileMetadataService.saveFileMetadata(
+				file.getOriginalFilename(),
+				fileId,
+				file.getSize(),
+				file.getContentType()
+		);
+		return file.getOriginalFilename();
 		// Generate metadata
 	}
 
@@ -32,7 +35,9 @@ public class FileServiceImpl implements FileService {
 	}
 
 	public List<String> getFileMetadata(String id) {
-		return blobStorageService.listBlobs();
+		List<String> s = blobStorageService.listBlobs();
+		s.add(fileMetadataService.getFileMetadataById(id).toString());
+		return s;
 		/* return new FileMetaResponse(
 				fileMetadata.fileName(),
 				fileMetadata.fileType(),

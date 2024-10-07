@@ -1,21 +1,15 @@
 package com.example.demo;
 
+import com.azure.spring.data.cosmos.repository.config.EnableCosmosRepositories;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-@RestController
+@EnableCosmosRepositories(basePackages = "com.example.demo.fileupload.cosmos.repo")
 public class LearnAzureApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(LearnAzureApplication.class, args);
-	}
-
-	@GetMapping("/v1/hello")
-	public String showDemo(){
-		return "Hey, welcome to Azure";
 	}
 
 }

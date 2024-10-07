@@ -23,6 +23,12 @@ public class BlobStorageService {
 	@Value("${azure.storage.container-name}")
 	private String containerName;
 
+	/*private BlobContainerClient getBlobContainerClient() {
+	   return new BlobClientBuilder()
+			   .connectionString(connectionString)
+			   .containerName(containerName)
+			   .buildClient().getContainerClient();
+   }*/
 	private BlobContainerClient getBlobContainerClient( ) {
 		// Create a BlobServiceClient to interact with the service
 		BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()

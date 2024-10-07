@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-//@EnableCosmosRepositories(basePackages = "com.example.demo.fileupload.cosmos.repo")
+@EnableCosmosRepositories(basePackages = "com.example.demo.fileupload.cosmos.repo")
 public class LearnAzureApplication {
 
 	public static void main(String[] args) {

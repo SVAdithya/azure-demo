@@ -2,6 +2,7 @@ package com.example.demo.fileupload.service;
 
 import com.example.demo.fileupload.cosmos.dto.Details;
 import com.example.demo.fileupload.cosmos.dto.FileMetadata;
+import com.example.demo.fileupload.cosmos.repo.FileMetadataRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,25 +12,21 @@ import java.util.Optional;
 @AllArgsConstructor
 @Service
 public class FileMetadataService {
-
-	//private FileMetadataRepository fileMetadataRepository;
+	private FileMetadataRepository fileMetadataRepository;
 
 	public FileMetadata saveFileMetadata(String name, String uuid, long size, String type) {
-
 		FileMetadata fileMetadata = generateFileMetadata(name, uuid, size, type);
-		return null; //fileMetadataRepository.save(fileMetadata);
+		return fileMetadataRepository.save(fileMetadata);
 	}
 
 	public FileMetadata getFileMetadataById(String id) {
-		//Optional<FileMetadata> metadata = fileMetadataRepository.findById(id);
-		//return metadata.orElse(null);
-		return null;
+		Optional<FileMetadata> metadata = fileMetadataRepository.findById(id);
+		return metadata.orElse(null);
 	}
 
 	public String deleteFileMetadata(String id) {
-		// TODO: is_deleted
-		//fileMetadataRepository.deleteById(id);
-		return null;
+		fileMetadataRepository.deleteById(id);
+		return "Deleted "+ id;
 	}
 
 	private static FileMetadata generateFileMetadata(String name, String uuid, long size, String type) {

@@ -11,9 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 	private final UserService userService;
+
 	@PostMapping("/v1/signUp")
-	public String postSignUpV1(@RequestBody SignUpRequest signUp){
-		String id = userService.registerOrUpdateUser(signUp.getUsername(), signUp.getPassword(), signUp.getEmail()).getUname();
-		return "success " + id;
+	public String postSignUpV1(@RequestBody SignUpRequest signUp) {
+		String msg = userService.registerUser(
+				signUp.getUsername(),
+				signUp.getPassword(),
+				signUp.getEmail()
+		);
+		return "success " + msg;
 	}
+
 }

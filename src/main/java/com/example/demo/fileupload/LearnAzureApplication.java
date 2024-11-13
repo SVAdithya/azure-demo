@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableCosmosRepositories(basePackages = "com.example.demo.fileupload.cosmos.repo")
 @EnableJpaRepositories(basePackages = "com.example.demo.fileupload.persistance")
-@EntityScan(basePackages = "com.example.demo.fileupload")
 public class LearnAzureApplication {
 
 	public static void main(String[] args) {

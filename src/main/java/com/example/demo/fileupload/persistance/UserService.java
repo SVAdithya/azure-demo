@@ -3,6 +3,7 @@ package com.example.demo.fileupload.persistance;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
 import java.util.Optional;
 
 @Service
@@ -23,5 +24,14 @@ public class UserService {
 			return userRepository.save(newUser).getUname();
 		}
 
+	}
+
+	public String loginRequest(String username, String password) throws AuthenticationException {
+		boolean isAuthenticated = userRepository.findByUnameAndPassword(username, password).isPresent();
+		if (isAuthenticated) {
+			return "Authenticated";
+		} else {
+			throw new AuthenticationException("Not Authenticated") ;
+		}
 	}
 }

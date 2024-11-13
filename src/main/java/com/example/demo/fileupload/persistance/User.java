@@ -1,10 +1,7 @@
 package com.example.demo.fileupload.persistance;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 @Getter
@@ -18,9 +15,14 @@ public class User{
 	@Column(name = "id", nullable = false)
 	private Long id;
 
-	String uname;
-	String password;
-	String email;
+	@Column(nullable = false)
+	private String email;
+
+	@Column(nullable = false)
+	private String uname;
+
+	@Column(nullable = false)
+	private String password;
 	String accessToken;
 	String refreshToken;
 }

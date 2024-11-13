@@ -19,3 +19,11 @@ Azure study
 
 `  curl --location --request GET 'localhost:8080/api/files/37e5d8af-966a-3d03-9eda-ea7b603bd157/metadata'
 `
+
+Connecting Mysql:
+
+
+
+mysql -h 127.0.0.1 -P 3306 -u user -p
+
+SHOW DATABASES;

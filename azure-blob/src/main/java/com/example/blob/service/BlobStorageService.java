@@ -1,4 +1,4 @@
-package com.example.demo.fileupload.service;
+package com.example.blob.service;
 
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;

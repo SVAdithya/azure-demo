@@ -1,6 +1,6 @@
-package com.example.demo.fileupload.controller;
+package com.example.app.controller;
 
-import com.example.demo.fileupload.service.FileServiceImpl;
+import com.example.app.service.FileServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

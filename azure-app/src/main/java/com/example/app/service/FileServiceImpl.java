@@ -1,11 +1,12 @@
-package com.example.demo.fileupload.service;
+package com.example.app.service;
 
+import com.example.cosmos.service.FileMetadataService;
+import com.example.blob.service.BlobStorageService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

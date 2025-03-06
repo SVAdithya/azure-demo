@@ -1,4 +1,4 @@
-package com.example.demo.fileupload.controller.response;
+package com.example.app.controller.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

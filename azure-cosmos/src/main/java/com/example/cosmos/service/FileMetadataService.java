@@ -1,8 +1,8 @@
-package com.example.demo.fileupload.service;
+package com.example.cosmos.service;
 
-import com.example.demo.fileupload.cosmos.dto.Details;
-import com.example.demo.fileupload.cosmos.dto.FileMetadata;
-import com.example.demo.fileupload.cosmos.repo.FileMetadataRepository;
+import com.example.cosmos.repo.FileMetadataRepository;
+import com.example.cosmos.repo.dto.Details;
+import com.example.cosmos.repo.dto.FileMetadata;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

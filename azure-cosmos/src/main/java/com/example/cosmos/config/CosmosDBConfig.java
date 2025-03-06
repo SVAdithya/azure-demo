@@ -1,4 +1,4 @@
-package com.example.demo.fileupload.cosmos.config;
+package com.example.cosmos.config;
 
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.cosmos.*;
@@ -18,7 +18,7 @@ import java.time.Duration;
 // reference : https://learn.microsoft.com/en-us/java/api/overview/azure/spring-data-cosmos-readme?view=azure-java-stable
 
 @Configuration
-@EnableCosmosRepositories
+@EnableCosmosRepositories(basePackages = "com.example.cosmos")
 public class CosmosDBConfig extends AbstractCosmosConfiguration {
 	@Value("${azure.cosmos.uri}")
 	private String uri;

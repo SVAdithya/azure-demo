@@ -1,4 +1,4 @@
-package com.example.demo.fileupload.cosmos.dto;
+package com.example.cosmos.repo.dto;
 
 public record Details(
 		String createdAt,

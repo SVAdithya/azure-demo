@@ -1,4 +1,4 @@
-package com.example.demo.fileupload.cosmos.dto;
+package com.example.cosmos.repo.dto;
 
 import com.azure.spring.data.cosmos.core.mapping.Container;
 import org.springframework.data.annotation.Id;

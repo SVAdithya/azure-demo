@@ -1,7 +1,8 @@
-package com.example.demo.fileupload.cosmos.repo;
+package com.example.cosmos.repo;
 
 import com.azure.spring.data.cosmos.repository.CosmosRepository;
-import com.example.demo.fileupload.cosmos.dto.FileMetadata;
+import com.azure.spring.data.cosmos.repository.config.EnableCosmosRepositories;
+import com.example.cosmos.repo.dto.FileMetadata;
 import org.springframework.stereotype.Repository;
 
 @Repository

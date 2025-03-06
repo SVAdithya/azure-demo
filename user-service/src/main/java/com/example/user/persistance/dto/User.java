@@ -1,4 +1,4 @@
-package com.example.demo.fileupload.persistance;
+package com.example.user.persistance.dto;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,5 +1,7 @@
-package com.example.demo.fileupload.persistance;
+package com.example.user.service;
 
+import com.example.user.persistance.dto.User;
+import com.example.user.persistance.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,6 @@ public class UserService {
 			newUser.setPassword(password);
 			return userRepository.save(newUser).getUname();
 		}
-
 	}
 
 	public String loginRequest(String username, String password) throws AuthenticationException {

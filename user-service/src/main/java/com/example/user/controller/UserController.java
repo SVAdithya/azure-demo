@@ -1,8 +1,8 @@
-package com.example.demo.fileupload.user;
+package com.example.user.controller;
 
-import com.example.demo.fileupload.persistance.UserService;
-import com.example.demo.fileupload.user.model.LoginRequest;
-import com.example.demo.fileupload.user.model.SignUpRequest;
+import com.example.user.controller.model.LoginRequest;
+import com.example.user.controller.model.SignUpRequest;
+import com.example.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

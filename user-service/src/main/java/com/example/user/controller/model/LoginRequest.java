@@ -1,4 +1,4 @@
-package com.example.demo.fileupload.user.model;
+package com.example.user.controller.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SignUpRequest {
+public class LoginRequest {
 	private String username;
 	private String password;
-	private String email;
 }

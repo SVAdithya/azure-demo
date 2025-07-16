@@ -7,7 +7,7 @@ variable "resource_group_name" {
 variable "location" {
   description = "The Azure region where the resources will be created."
   # Change the default value to your desired location
-  default     = "East US"
+  default     = "West India"
 }
 
 variable "storage_account_name" {

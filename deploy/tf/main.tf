@@ -1,6 +1,8 @@
-# Provider block
+variable "subscription_id" {}
+
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
 }
 
 # Resource Group
@@ -20,7 +22,7 @@ resource "azurerm_storage_account" "storage" {
 
 # Storage Container
 resource "azurerm_storage_container" "container" {
-  name                  = "content"
+  name                  = "test1"
   storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = "private"
 }
@@ -58,8 +60,8 @@ resource "azurerm_cosmosdb_sql_container" "container" {
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.cosmosdb.name
   database_name         = azurerm_cosmosdb_sql_database.database.name
-  partition_key_path    = "/id"
   partition_key_version = 1
+  partition_key_paths    = ["/id"]
   autoscale_settings {
     max_throughput = 4000
   }

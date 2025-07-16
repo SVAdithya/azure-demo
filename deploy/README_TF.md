@@ -25,7 +25,10 @@ This Terraform configuration deploys an Azure Resource Group, an Azure Storage A
 
 3. **Initialize Terraform:**
 
+   Navigate to the `tf` directory and run `terraform init`:
+
    ```bash
+   cd tf
    terraform init
    ```
 
@@ -33,51 +36,27 @@ This Terraform configuration deploys an Azure Resource Group, an Azure Storage A
 
 ### Planning
 
-To see what resources will be created, run:
+To see what resources will be created, run `terraform plan` from the `tf` directory:
 
 ```bash
-terraform plan
+terraform plan -var-file="../terraform.tfvars"
 ```
 
 ### Applying
 
-To deploy the resources, run:
+To deploy the resources, run `terraform apply` from the `tf` directory:
 
 ```bash
-terraform apply
+terraform apply -var-file="../terraform.tfvars"
 ```
 
 You will be prompted to confirm the deployment. Type `yes` to proceed.
 
 ### Modifying Variables
 
-You can change the default values for the location, resource group name, storage account name, and Cosmos DB account name by editing the `deploy/variables.tf` file.
+You can change the values for the location, resource group name, storage account name, and Cosmos DB account name by editing the `deploy/terraform.tfvars` file.
 
-- **Resource Group Name:** Change the `default` value on line 3.
-- **Location:** Change the `default` value on line 8.
-- **Storage Account Name:** Change the `default` value on line 13.
-- **Cosmos DB Account Name:** Change the `default` value on line 18.
-
-Alternatively, you can provide dynamic values for the variables in a few ways:
-
-**1. Using a `.tfvars` file:**
-
-Create a `terraform.tfvars` file in the `deploy` directory and add the following content:
-
-```
-resource_group_name = "my-dynamic-rg-name"
-location            = "West US"
-```
-
-Then run `terraform apply` with the `-var-file` flag:
-
-```bash
-terraform apply -var-file="terraform.tfvars"
-```
-
-**2. Using command-line variables:**
-
-You can also pass the variables directly in the command line:
+Alternatively, you can pass the variables directly in the command line:
 
 ```bash
 terraform apply -var="resource_group_name=my-dynamic-rg-name" -var="location=West US"

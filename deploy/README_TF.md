@@ -50,3 +50,39 @@ After the deployment is complete, Terraform will output the following:
 ```bash
 terraform destroy
 ```
+
+## Architecture Diagram
+
+```
++-------------------------------------------------------------------------------------------------+
+|                                                                                                 |
+|  +-------------------------+      +-------------------------+      +-------------------------+  |
+|  |   Application Gateway   |----->|      App Service        |----->|        Key Vault        |  |
+|  +-------------------------+      +-------------------------+      +-------------------------+  |
+|               |                                |                                |                 |
+|               |                                |                                |                 |
+|  +-------------------------+      +-------------------------+      +-------------------------+  |
+|  |      Storage Account    |----->|        Cosmos DB        |<-----|        App Service        |  |
+|  +-------------------------+      +-------------------------+      +-------------------------+  |
+|                                                                                                 |
++-------------------------------------------------------------------------------------------------+
+```
+
+## Architecture Overview
+
+This Terraform configuration creates a secure and private Azure environment for a web application. The architecture consists of the following components:
+
+* **Virtual Network (VNet):** A private network that isolates the resources from the public internet. The VNet is divided into three subnets:
+    * **App Service Subnet:** Hosts the App Service.
+    * **Private Endpoint Subnet:** Hosts the private endpoints for the other services.
+    * **Application Gateway Subnet:** Hosts the Application Gateway.
+
+* **Private Endpoints:** Private endpoints are used to connect to the Storage Account, Cosmos DB, and Key Vault over a private IP address within the VNet. This ensures that all traffic to these services remains on the Azure backbone and is not exposed to the public internet.
+
+* **Network Security Group (NSG):** An NSG is associated with the subnets to control traffic flow. It includes a rule to allow inbound traffic to the App Service from the Application Gateway.
+
+* **Application Gateway:** An Application Gateway is used to publish the App Service to the internet securely. It provides a public IP address and acts as a reverse proxy, forwarding requests to the App Service. It also provides features like SSL termination and a Web Application Firewall (WAF).
+
+* **App Service:** The App Service hosts the web application. It is configured to only accept traffic from the Application Gateway and to connect to the other services using private endpoints.
+
+* **Storage Account, Cosmos DB, and Key Vault:** These services are configured to deny public network access and only allow connections from the private endpoints.

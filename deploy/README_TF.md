@@ -86,3 +86,16 @@ This Terraform configuration creates a secure and private Azure environment for 
 * **App Service:** The App Service hosts the web application. It is configured to only accept traffic from the Application Gateway and to connect to the other services using private endpoints.
 
 * **Storage Account, Cosmos DB, and Key Vault:** These services are configured to deny public network access and only allow connections from the private endpoints.
+
+## CI/CD Pipelines
+
+This project includes two CI/CD pipelines for building and deploying the application to Azure Container Instances:
+
+* **Azure Pipeline:** The `azure-pipelines.yml` file defines a pipeline for Azure DevOps. To use this pipeline, you will need to:
+    1. Create a new pipeline in your Azure DevOps project and point it to your repository.
+    2. Create a service connection to your Azure subscription and update the `dockerRegistryServiceConnection` and `azureSubscription` variables in the `azure-pipelines.yml` file.
+    3. Update the `imageRepository` and `containerRegistry` variables to match your environment.
+
+* **GitHub Actions:** The `.github/workflows/deploy-to-aci.yml` file defines a workflow for GitHub Actions. To use this workflow, you will need to:
+    1. Create secrets in your GitHub repository for `AZURE_CREDENTIALS`, `REGISTRY_LOGIN_SERVER`, `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`, `RESOURCE_GROUP`, and `DNS_NAME_LABEL`.
+    2. Update the `<your-image-repo>` placeholder in the `.github/workflows/deploy-to-aci.yml` file to match your image repository.

@@ -52,6 +52,14 @@ resource "azurerm_cosmosdb_account" "cosmosdb" {
 }
 
 # Key Vault
+resource "azurerm_container_registry" "acr" {
+  name                = var.acr_name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Standard"
+  admin_enabled       = true
+}
+
 resource "azurerm_key_vault" "kv" {
   name                        = var.key_vault_name
   location                    = azurerm_resource_group.rg.location
@@ -265,7 +273,9 @@ resource "azurerm_linux_web_app" "appservice" {
   location            = azurerm_service_plan.appserviceplan.location
   service_plan_id     = azurerm_service_plan.appserviceplan.id
 
-  site_config {}
+  site_config {
+    linux_fx_version = "DOCKER|${azurerm_container_registry.acr.login_server}/<your-image-repo>:${tag}"
+  }
 
   identity {
     type = "SystemAssigned"
@@ -275,6 +285,9 @@ resource "azurerm_linux_web_app" "appservice" {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.appinsights.instrumentation_key
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.appinsights.connection_string
     "AppConfig_Endpoint" = azurerm_app_configuration.appconf.endpoint
+    "DOCKER_REGISTRY_SERVER_URL" = "https://{azurerm_container_registry.acr.login_server}"
+    "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.acr.admin_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.acr.admin_password
   }
 
   virtual_network_subnet_id = azurerm_subnet.appservice_subnet.id

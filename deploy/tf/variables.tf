@@ -63,3 +63,14 @@ variable "app_gateway_name" {
   # Change the default value to your desired Application Gateway name
   default     = "appgw-terraform-sample"
 }
+
+variable "acr_name" {
+  description = "The name of the Azure Container Registry."
+  # Change the default value to your desired Azure Container Registry name
+  default     = "acrterraformsampladithya"
+}
+
+variable "tag" {
+  description = "The tag for the container image."
+  default     = "latest"
+}

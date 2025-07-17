@@ -51,3 +51,15 @@ variable "app_insights_name" {
   # Change the default value to your desired Application Insights name
   default     = "appi-terraform-sample"
 }
+
+variable "vnet_name" {
+  description = "The name of the Virtual Network."
+  # Change the default value to your desired Virtual Network name
+  default     = "vnet-terraform-sample"
+}
+
+variable "app_gateway_name" {
+  description = "The name of the Application Gateway."
+  # Change the default value to your desired Application Gateway name
+  default     = "appgw-terraform-sample"
+}

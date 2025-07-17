@@ -8,6 +8,8 @@ import com.azure.spring.data.cosmos.config.CosmosConfig;
 import com.azure.spring.data.cosmos.core.ResponseDiagnostics;
 import com.azure.spring.data.cosmos.core.ResponseDiagnosticsProcessor;
 import com.azure.spring.data.cosmos.repository.config.EnableCosmosRepositories;
+import com.example.app.config.KeyVaultSecrets;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +22,9 @@ import java.time.Duration;
 @Configuration
 @EnableCosmosRepositories(basePackages = "com.example.cosmos")
 public class CosmosDBConfig extends AbstractCosmosConfiguration {
-	@Value("${azure.cosmos.uri}")
-	private String uri;
 
-	@Value("${azure.cosmos.key}")
-	private String key;
+	@Autowired
+	private KeyVaultSecrets keyVaultSecrets;
 
 	@Value("${azure.cosmos.database}")
 	private String dbName;
@@ -63,11 +63,11 @@ public class CosmosDBConfig extends AbstractCosmosConfiguration {
 
 	@Bean
 	public CosmosClientBuilder getCosmosClientBuilder() {
-		this.azureKeyCredential = new AzureKeyCredential(key);
+		this.azureKeyCredential = new AzureKeyCredential(keyVaultSecrets.getCosmosKey());
 		DirectConnectionConfig directConnectionConfig = new DirectConnectionConfig();
 		GatewayConnectionConfig gatewayConnectionConfig = new GatewayConnectionConfig();
 		return new CosmosClientBuilder()
-				.endpoint(uri)
+				.endpoint(keyVaultSecrets.getCosmosUri())
 				.credential(azureKeyCredential)
 				.directMode(directConnectionConfig, gatewayConnectionConfig)
 				.consistencyLevel(ConsistencyLevel.valueOf(consistencyLevel))

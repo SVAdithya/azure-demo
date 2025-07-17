@@ -4,6 +4,8 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
+import com.example.app.config.KeyVaultSecrets;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,21 +20,21 @@ import java.util.List;
 @Service
 public class BlobStorageService {
 
-	@Value("${azure.storage.connection-string}")
-	private String connectionString;
+	@Autowired
+	private KeyVaultSecrets keyVaultSecrets;
 	@Value("${azure.storage.container-name}")
 	private String containerName;
 
 	/*private BlobContainerClient getBlobContainerClient() {
 	   return new BlobClientBuilder()
-			   .connectionString(connectionString)
+			   .connectionString(keyVaultSecrets.getStorageConnectionString())
 			   .containerName(containerName)
 			   .buildClient().getContainerClient();
    }*/
 	private BlobContainerClient getBlobContainerClient( ) {
 		// Create a BlobServiceClient to interact with the service
 		BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-				.connectionString(connectionString)
+				.connectionString(keyVaultSecrets.getStorageConnectionString())
 				.buildClient();
 
 		// Get the container client for the specified container name

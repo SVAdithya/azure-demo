@@ -30,6 +30,13 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.azure.spring/azure-spring-boot-starter-keyvault-secrets -->
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>azure-spring-boot-starter-keyvault-secrets</artifactId>
+            <version>5.12.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

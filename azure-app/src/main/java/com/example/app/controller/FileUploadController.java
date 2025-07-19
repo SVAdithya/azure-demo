@@ -52,7 +52,7 @@ public class FileUploadController {
 	@GetMapping("/{id}/metadata")
 	public ResponseEntity<Object> getFileMetadata(
 			@Parameter(description = "ID of the file to retrieve metadata for") @PathVariable String id) {
-		// FileMetaResponse metadata = fileService.getFileMetadata(id);
+		// gRPC endpoint is also available for this method.
 		List<String> metadata = fileService.getFileMetadata(id);
 		return ResponseEntity.ok(metadata);
 	}

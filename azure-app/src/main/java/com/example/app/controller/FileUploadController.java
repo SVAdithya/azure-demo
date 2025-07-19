@@ -4,12 +4,13 @@ import com.example.app.grpc.FileServiceGrpc;
 import com.example.app.grpc.GetFileMetadataRequest;
 import com.example.app.grpc.GetFileMetadataResponse;
 import com.example.app.service.FileServiceImpl;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +20,20 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/api/files")
 @Tag(name = "File API", description = "Endpoints for file management")
 public class FileUploadController {
 
-	private FileServiceImpl fileService;
+	private final FileServiceImpl fileService;
+	private final FileServiceGrpc.FileServiceBlockingStub fileServiceBlockingStub;
 
-	@GrpcClient("fileService")
-	private FileServiceGrpc.FileServiceBlockingStub fileServiceBlockingStub;
+	public FileUploadController(FileServiceImpl fileService) {
+		this.fileService = fileService;
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+				.usePlaintext()
+				.build();
+		this.fileServiceBlockingStub = FileServiceGrpc.newBlockingStub(channel);
+	}
 
 	@Operation(summary = "Upload a file")
 	@ApiResponse(responseCode = "200", description = "File uploaded successfully")

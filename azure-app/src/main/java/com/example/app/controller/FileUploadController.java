@@ -1,11 +1,15 @@
 package com.example.app.controller;
 
+import com.example.app.grpc.FileServiceGrpc;
+import com.example.app.grpc.GetFileMetadataRequest;
+import com.example.app.grpc.GetFileMetadataResponse;
 import com.example.app.service.FileServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +25,9 @@ import java.util.List;
 public class FileUploadController {
 
 	private FileServiceImpl fileService;
+
+	@GrpcClient("fileService")
+	private FileServiceGrpc.FileServiceBlockingStub fileServiceBlockingStub;
 
 	@Operation(summary = "Upload a file")
 	@ApiResponse(responseCode = "200", description = "File uploaded successfully")
@@ -64,6 +71,16 @@ public class FileUploadController {
 			@Parameter(description = "ID of the file to delete") @PathVariable String id) {
 		String fileName = fileService.deleteFile(id);
 		return ResponseEntity.ok(fileName + "File deleted successfully.");
+	}
+
+	@Operation(summary = "Get file metadata using gRPC")
+	@ApiResponse(responseCode = "200", description = "File metadata retrieved successfully")
+	@GetMapping("/v2/{id}/metadata")
+	public ResponseEntity<Object> getFileMetadataV2(
+			@Parameter(description = "ID of the file to retrieve metadata for") @PathVariable String id) {
+		GetFileMetadataRequest request = GetFileMetadataRequest.newBuilder().setFileId(id).build();
+		GetFileMetadataResponse response = fileServiceBlockingStub.getFileMetadata(request);
+		return ResponseEntity.ok(response.getFileName());
 	}
 }
 

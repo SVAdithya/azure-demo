@@ -75,6 +75,12 @@ This ARM template deploys an Azure Cosmos DB account and an Azure Storage accoun
    ```bash
    az deployment group create --resource-group <resource-group-name> --template-file deploy.json --parameters storageAccountName=<storage-account-name> cosmosDbAccountName=<cosmos-db-account-name>
    ```
+   
+Sample:
+az deployment group create \
+--resource-group ARMresourcegroup \
+--template-file arm_template.json \
+--parameters storageAccountName=samplestacc cosmosDbAccountName=cosmosdbacc
 
 ## Using a Parameters File
 

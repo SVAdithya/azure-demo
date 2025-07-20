@@ -21,3 +21,13 @@ variable "cosmosdb_account_name" {
   # Change the default value to your desired Cosmos DB account name
   default     = "cosdb-terraform-sample"
 }
+
+variable "key_vault_name" {
+  description = "The name of the Key Vault."
+  default     = "kv-terraform-sample"
+}
+
+variable "app_configuration_name" {
+  description = "The name of the App Configuration."
+  default     = "appconf-terraform-sample"
+}

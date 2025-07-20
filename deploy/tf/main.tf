@@ -47,6 +47,61 @@ resource "azurerm_cosmosdb_account" "cosmosdb" {
   }
 }
 
+# Key Vault
+resource "azurerm_key_vault" "kv" {
+  name                = var.key_vault_name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku_name            = "standard"
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "Get",
+      "Create",
+      "Delete",
+      "List",
+      "Update",
+      "Import",
+      "Backup",
+      "Restore",
+      "Recover",
+      "Purge",
+    ]
+
+    secret_permissions = [
+      "Get",
+      "List",
+      "Set",
+      "Delete",
+      "Backup",
+      "Restore",
+      "Recover",
+      "Purge",
+    ]
+  }
+}
+
+# App Configuration
+resource "azurerm_app_configuration" "appconf" {
+  name                = var.app_configuration_name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "standard"
+}
+
+# Secret for App Configuration Connection String
+resource "azurerm_key_vault_secret" "appconf_conn_string" {
+  name         = "app-configuration-connection-string"
+  value        = azurerm_app_configuration.appconf.primary_read_key[0].connection_string
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+data "azurerm_client_config" "current" {}
+
 # Cosmos DB SQL Database
 resource "azurerm_cosmosdb_sql_database" "database" {
   name                = "pocs"

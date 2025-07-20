@@ -1,8 +1,0 @@
-{
-  "storageAccountName": {
-    "value": "samplestacc"
-  },
-  "cosmosDbAccountName": {
-    "value": "cosmosdbacc"
-  }
-}

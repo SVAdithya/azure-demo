@@ -102,6 +102,21 @@ resource "azurerm_key_vault_secret" "appconf_conn_string" {
 
 data "azurerm_client_config" "current" {}
 
+locals {
+  properties = {
+    for line in split("\n", file("${path.module}/app.properties")) :
+    split("=", line)[0] => split("=", line)[1]
+    if can(regex("=", line))
+  }
+}
+
+resource "azurerm_app_configuration_key" "app_properties" {
+  for_each          = local.properties
+  configuration_store_id = azurerm_app_configuration.appconf.id
+  key               = each.key
+  value             = each.value
+}
+
 # Cosmos DB SQL Database
 resource "azurerm_cosmosdb_sql_database" "database" {
   name                = "pocs"

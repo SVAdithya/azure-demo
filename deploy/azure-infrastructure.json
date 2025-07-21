@@ -1,0 +1,385 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Azure Infrastructure ARM Template - VNet, Cosmos DB, Storage, Key Vault, App Config"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "dev",
+      "allowedValues": [
+        "dev",
+        "staging",
+        "prod"
+      ],
+      "metadata": {
+        "description": "Environment name"
+      }
+    },
+    "projectName": {
+      "type": "string",
+      "defaultValue": "myapp",
+      "metadata": {
+        "description": "Project name used for resource naming"
+      }
+    },
+    "adminObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Object ID of the user or service principal that will have access to Key Vault"
+      }
+    }
+  },
+  "variables": {
+    "resourcePrefix": "[concat(parameters('projectName'), '-', parameters('environmentName'))]",
+    "vnetName": "[concat(variables('resourcePrefix'), '-vnet')]",
+    "subnetName": "[concat(variables('resourcePrefix'), '-subnet')]",
+    "nsgName": "[concat(variables('resourcePrefix'), '-nsg')]",
+    "cosmosDbAccountName": "[concat(variables('resourcePrefix'), '-cosmos')]",
+    "storageAccountName": "[concat(replace(variables('resourcePrefix'), '-', ''), 'storage')]",
+    "keyVaultName": "[concat(variables('resourcePrefix'), '-kv')]",
+    "appConfigName": "[concat(variables('resourcePrefix'), '-appconfig')]",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetPrefix": "10.0.1.0/24"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-05-01",
+      "name": "[variables('nsgName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowHTTPS",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowHTTP",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1001,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      },
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2023-05-01",
+      "name": "[variables('vnetName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+              },
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                },
+                {
+                  "service": "Microsoft.AzureCosmosDB"
+                },
+                {
+                  "service": "Microsoft.KeyVault"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "defaultToOAuthAuthentication": false,
+        "allowCrossTenantReplication": false,
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false,
+        "allowSharedKeyAccess": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('subnetName'))]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": [],
+          "defaultAction": "Deny"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      },
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2023-04-15",
+      "name": "[variables('cosmosDbAccountName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+      ],
+      "kind": "GlobalDocumentDB",
+      "properties": {
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "Session"
+        },
+        "locations": [
+          {
+            "locationName": "[parameters('location')]",
+            "failoverPriority": 0,
+            "isZoneRedundant": false
+          }
+        ],
+        "databaseAccountOfferType": "Standard",
+        "enableAutomaticFailover": false,
+        "enableMultipleWriteLocations": false,
+        "isVirtualNetworkFilterEnabled": true,
+        "virtualNetworkRules": [
+          {
+            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('subnetName'))]",
+            "ignoreMissingVNetServiceEndpoint": false
+          }
+        ],
+        "disableKeyBasedMetadataWriteAccess": false,
+        "enableFreeTier": false,
+        "enableAnalyticalStorage": false,
+        "analyticalStorageConfiguration": {
+          "schemaType": "WellDefined"
+        },
+        "createMode": "Default",
+        "backupPolicy": {
+          "type": "Periodic",
+          "periodicModeProperties": {
+            "backupIntervalInMinutes": 240,
+            "backupRetentionIntervalInHours": 8,
+            "backupStorageRedundancy": "Local"
+          }
+        },
+        "minimalTlsVersion": "Tls12"
+      },
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2023-02-01",
+      "name": "[variables('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+      ],
+      "properties": {
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "tenantId": "[subscription().tenantId]",
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[parameters('adminObjectId')]",
+            "permissions": {
+              "keys": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "secrets": [
+                "Get",
+                "List",
+                "Set",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "certificates": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore",
+                "ManageContacts",
+                "ManageIssuers",
+                "GetIssuers",
+                "ListIssuers",
+                "SetIssuers",
+                "DeleteIssuers"
+              ]
+            }
+          }
+        ],
+        "enabledForDeployment": false,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": true,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 90,
+        "enableRbacAuthorization": false,
+        "vaultUri": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
+        "provisioningState": "Succeeded",
+        "publicNetworkAccess": "Disabled",
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "defaultAction": "Deny",
+          "virtualNetworkRules": [
+            {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('subnetName'))]",
+              "ignoreMissingVnetServiceEndpoint": false
+            }
+          ]
+        }
+      },
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      }
+    },
+    {
+      "type": "Microsoft.AppConfiguration/configurationStores",
+      "apiVersion": "2023-03-01",
+      "name": "[variables('appConfigName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+      ],
+      "sku": {
+        "name": "standard"
+      },
+      "properties": {
+        "encryption": {},
+        "disableLocalAuth": false,
+        "softDeleteRetentionInDays": 7,
+        "enablePurgeProtection": false,
+        "publicNetworkAccess": "Disabled",
+        "networkAcls": {
+          "defaultAction": "Deny",
+          "virtualNetworkRules": [
+            {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('subnetName'))]",
+              "ignoreMissingVnetServiceEndpoint": false
+            }
+          ]
+        }
+      },
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      }
+    }
+  ],
+  "outputs": {
+    "vnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+    },
+    "subnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('subnetName'))]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "cosmosDbAccountName": {
+      "type": "string",
+      "value": "[variables('cosmosDbAccountName')]"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "value": "[variables('keyVaultName')]"
+    },
+    "appConfigName": {
+      "type": "string",
+      "value": "[variables('appConfigName')]"
+    },
+    "keyVaultUri": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))).vaultUri]"
+    }
+  }
+}

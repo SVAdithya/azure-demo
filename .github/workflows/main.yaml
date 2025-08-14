@@ -15,22 +15,31 @@ permissions:
 
 jobs:
   build_test:
-    name: Build and Test (Maven)
+    name: Build and analyze
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.draft == false }}
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
         with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # or 'adopt', depending on your preference
+          java-version: '21'
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
-      - name: Maven Clean Install
-        run: mvn -B -ntp clean install
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
   sonarcloud:
     name: SonarCloud Analysis
@@ -178,3 +187,4 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

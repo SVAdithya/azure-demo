@@ -2,7 +2,7 @@ name: PR Checks
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, test2 ]
     types: [ opened, synchronize, reopened, ready_for_review ]
 
 concurrency:
@@ -187,4 +187,5 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 

@@ -1,0 +1,10 @@
+**/target/
+**/.git/
+**/.idea/
+**/.vscode/
+**/.mvn/
+**/node_modules/
+.git
+.gitignore
+README.md
+**/.DS_Store

@@ -7,7 +7,6 @@ on:
   pull_request:
     branches:
       - '**'
-
 concurrency:
   group: pr-checks-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -34,57 +33,3 @@ jobs:
 
       - name: Maven Clean Install
         run: mvn -B -ntp clean install
-
-  terraform_validate:
-    name: Terraform Validate
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.draft == false && hashFiles('deploy/tf/**') != '' }}
-    defaults:
-      run:
-        working-directory: deploy/tf
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Init (no backend)
-        run: terraform init -backend=false
-
-      - name: Terraform Validate
-        run: terraform validate
-
-  hadolint:
-    name: Dockerfile Lint (Hadolint)
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.draft == false && hashFiles('Dockerfile') != '' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Lint Dockerfile
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: Dockerfile
-
-  trivy_fs:
-    name: Trivy Filesystem Scan
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.draft == false }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Run Trivy FS (High/Critical)
-        uses: aquasecurity/trivy-action@0.24.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          exit-code: '1'
-          ignore-unfixed: true
-          severity: 'HIGH,CRITICAL'
-

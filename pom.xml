@@ -16,7 +16,6 @@
     <description>Learning Azure project</description>
     <modules>
         <module>azure-app</module>
-        <module>user-service</module>
         <module>azure-cosmos</module>
         <module>azure-blob</module>
     </modules>

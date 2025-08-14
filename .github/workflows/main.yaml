@@ -33,18 +33,3 @@ jobs:
 
       - name: Maven Clean Install
         run: mvn -B -ntp clean install
-
-  hadolint:
-    name: Dockerfile Lint (Hadolint)
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.draft == false && hashFiles('Dockerfile') != '' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Lint Dockerfile
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: Dockerfile
-
-

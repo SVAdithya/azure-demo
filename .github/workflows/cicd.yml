@@ -16,6 +16,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    environment:
+      name: ${{ vars.ENVIRONMENT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,6 +63,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    environment:
+      name: ${{ vars.ENVIRONMENT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -106,6 +110,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    environment:
+      name: ${{ vars.ENVIRONMENT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

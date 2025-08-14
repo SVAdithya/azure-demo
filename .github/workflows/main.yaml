@@ -86,6 +86,3 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: 'HIGH,CRITICAL'
-  spring_advisor:
-    name: Spring Application Advisor
-    uses: cpage-pivotal/spring-app-advisor-action@main

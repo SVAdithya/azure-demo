@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.app.grpc";
+option java_outer_classname = "FileProto";
+
+package com.example.app;
+
+service FileService {
+  rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
+}
+
+message GetFileMetadataRequest {
+  string fileId = 1;
+}
+
+message GetFileMetadataResponse {
+  string fileName = 1;
+  string fileType = 2;
+  int64 fileSize = 3;
+  string fileId = 4;
+  bool isArchived = 5;
+  bool isDeleted = 6;
+}

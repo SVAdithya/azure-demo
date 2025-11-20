@@ -1,6 +1,11 @@
 package com.example.app.controller;
 
+import com.example.app.grpc.FileServiceGrpc;
+import com.example.app.grpc.GetFileMetadataRequest;
+import com.example.app.grpc.GetFileMetadataResponse;
 import com.example.app.service.FileServiceImpl;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,12 +20,20 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/api/files")
 @Tag(name = "File API", description = "Endpoints for file management")
 public class FileUploadController {
 
-	private FileServiceImpl fileService;
+	private final FileServiceImpl fileService;
+	private final FileServiceGrpc.FileServiceBlockingStub fileServiceBlockingStub;
+
+	public FileUploadController(FileServiceImpl fileService) {
+		this.fileService = fileService;
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+				.usePlaintext()
+				.build();
+		this.fileServiceBlockingStub = FileServiceGrpc.newBlockingStub(channel);
+	}
 
 	@Operation(summary = "Upload a file")
 	@ApiResponse(responseCode = "200", description = "File uploaded successfully")
@@ -52,7 +65,7 @@ public class FileUploadController {
 	@GetMapping("/{id}/metadata")
 	public ResponseEntity<Object> getFileMetadata(
 			@Parameter(description = "ID of the file to retrieve metadata for") @PathVariable String id) {
-		// FileMetaResponse metadata = fileService.getFileMetadata(id);
+		// gRPC endpoint is also available for this method.
 		List<String> metadata = fileService.getFileMetadata(id);
 		return ResponseEntity.ok(metadata);
 	}
@@ -64,6 +77,16 @@ public class FileUploadController {
 			@Parameter(description = "ID of the file to delete") @PathVariable String id) {
 		String fileName = fileService.deleteFile(id);
 		return ResponseEntity.ok(fileName + "File deleted successfully.");
+	}
+
+	@Operation(summary = "Get file metadata using gRPC")
+	@ApiResponse(responseCode = "200", description = "File metadata retrieved successfully")
+	@GetMapping("/v2/{id}/metadata")
+	public ResponseEntity<Object> getFileMetadataV2(
+			@Parameter(description = "ID of the file to retrieve metadata for") @PathVariable String id) {
+		GetFileMetadataRequest request = GetFileMetadataRequest.newBuilder().setFileId(id).build();
+		GetFileMetadataResponse response = fileServiceBlockingStub.getFileMetadata(request);
+		return ResponseEntity.ok(response.getFileName());
 	}
 }
 
